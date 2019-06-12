@@ -1,51 +1,57 @@
+(function() {
+  function Question(question, answers, correct) {
+    this.question = question;
+    this.answers = answers;
+    this.correct = correct;
 
+    this.log = function() {
+      console.log(this.question);
+      for (var i in this.answers) {
+        console.log(i + ": " + this.answers[i]);
+      }
+    };
+  }
 
-function questionsPlugin() {
-    var scores = 0;
+  function Quiz() {
+    this.questions = [
+      new Question("What is my name?", ["Sofia", "Olga", "Julia"], 1),
+      new Question("What is my age?", [10, 20, 15, 52, 30], 4),
+      new Question("Where am I from?", ["Kemerovo", "Krakow", "Inskoy"], 2)
+    ];
+    this.scores = 0;
+    this.EXIT_ANSWER = "exit";
 
-    function Question(question, answers, correct) {
-        this.question = question;
-        this.answers = answers;
-        this.correct = correct;
-        this.answer = 0;
-        this.log = function() {
-            console.log(question);
-            for (var i in answers) {
-                console.log(i + ': ' + answers[i] );
-            };    
-        };
-        this.check = function() {
-            if (this.answer == this.correct) {
-                scores++;
-                console.log('Answer is correct! Your scores is: ' + scores);              
-            } else if (this.answer == 'exit') {
-                console.log('THE END! Your scores is: ' + scores);
-            } else {
-                console.log('Answer is NOT correct! Your scores is: ' + scores);
-            }
-        }
+    this.getRandomQuestion = function() {
+      return this.questions[Math.floor(Math.random() * this.questions.length)];
     };
 
-    var exit;
-
-    function ask(a) {
-        a.log();
-        a.answer = prompt('Please select the correct answer (just type the number.'); 
-        exit = a.answer;
-        a.check();
-    } 
-
-    var Name = new Question('What is my name?', ['Sofia', 'Olga', 'Julia'], 1);
-    var Age = new Question('What is my age?', [10, 20, 15, 52, 30], 4);
-    var City = new Question('Where am I from?', ['Kemerovo', 'Krakow', 'Inskoy'], 2);
-    
-    var questions = [Name, Age, City];
-
-    while(exit != 'exit') {
-        ask(questions[Math.floor(Math.random()*questions.length)]);
+    this.ask = function(question) {
+      question.log();
+      var answer = prompt(
+        "Please select the correct answer (just type the number) or type 'exit'"
+      );
+      this.checkQuestionAnswer(question, answer);
+      return answer;
     };
-    
-    
-}
 
-questionsPlugin();
+    this.checkQuestionAnswer = function(question, answer) {
+      if (answer == question.correct) {
+        this.scores++;
+        console.log("Answer is correct! Your scores is: " + this.scores);
+      } else if (answer == this.EXIT_ANSWER) {
+        console.log("THE END! Your scores is: " + this.scores);
+      } else {
+        console.log("Answer is NOT correct! Your scores is: " + this.scores);
+      }
+    };
+
+    this.start = function() {
+      var answer;
+      while (answer !== this.EXIT_ANSWER) {
+        answer = this.ask(this.getRandomQuestion());
+      }
+    };
+  }
+
+  new Quiz().start();
+})();
